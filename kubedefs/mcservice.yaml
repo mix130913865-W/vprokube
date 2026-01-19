@@ -1,12 +1,18 @@
+# API Version 與 Resource Type
 apiVersion: v1
 kind: Service
 metadata:
-  name: vprocache01
+  name: vprocache01         # Service 名稱，應用程式透過此 Name 連線至快取服務
 spec:
+  # 網路 Port 配置
   ports:
-  - port: 11211
-    targetPort: vpromc-port
-    protocol: TCP
+  - port: 11211             # Service 在 Cluster 內部開放的 Port
+    targetPort: vpromc-port # 流量轉發至 Pod 中定義的 Port 名稱 (11211)
+    protocol: TCP           # 傳輸層協定使用 TCP
+    
+  # Label Selector
   selector:
-    app: vpromc 
-  type: ClusterIP
+    app: vpromc             # 根據 Label 對接帶有此標籤的 Memcached Pod
+    
+  # Service Type
+  type: ClusterIP           # 僅限 Cluster 內部通訊，不對外公開
