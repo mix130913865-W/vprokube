@@ -1,41 +1,41 @@
-# 定義 API 版本與資源類型
+# 指定 API 版本與資源類型
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: vproapp        # 部署物件的名稱
+  name: vproapp        # Deployment 的名稱
   labels:
-    app: vproapp       # 部署物件本身的標籤
+    app: vproapp       # 標註此 Deployment 的 Label
 spec:
-  replicas: 1          # 指定運行 1 個 Pod 副本
+  replicas: 1          # 定義 Pod 的副本數量為 1
   selector:
     matchLabels:
-      app: vproapp     # 標籤選擇器，用來管理帶有此標籤的 Pod
+      app: vproapp     # Selector 用於尋找並管理帶有此 Label 的 Pod
   template:
     metadata:
       labels:
-        app: vproapp   # 設定 Pod 的標籤，必須與 selector 匹配
+        app: vproapp   # 設定 Pod 的 Label，必須符合上面的 Selector
     spec:
       containers:
       - name: vproapp
-        image: vprocontainers/vprofileapp # 應用程式的鏡像檔案
-        imagePullPolicy: Always           # 每次啟動都重新從鏡像倉庫拉取最新鏡像
+        image: vprocontainers/vprofileapp # 應用程式的 Container Image
+        imagePullPolicy: Always           # 每次部署時強制從 Registry 下載最新版本
         ports:
         - name: vproapp-port
-          containerPort: 8080             # 容器內部監聽的埠號
+          containerPort: 8080             # Container 內部監聽的 Port
 
-      # 初始化容器：在主容器啟動前執行，若執行失敗，主容器不會啟動
+      # Init Containers：在主 Container 啟動前的預檢查機制
       initContainers:
-      # 1. 檢查資料庫是否就緒
+      # 第一個 Init Container：檢查 Database 是否就緒
       - name: init-mydb
         image: busybox
         command: ['sh']
-        # 循環執行 nslookup 檢查 vprodb 服務的 DNS 是否能解析
-        # $(cat ...) 部分會自動取得目前的 Namespace，拼接成完整的內部域名
+        # 透過 nslookup 檢查 vprodb Service 的 DNS 解析
+        # 利用 cat 指令從 Service Account 檔案動態取得目前的 Namespace
         args: ['-c', 'until nslookup vprodb.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for mydb; sleep 2; done;']
       
-      # 2. 檢查快取伺服器是否就緒
+      # 第二個 Init Container：檢查 Memcached 是否就緒
       - name: init-memcache
         image: busybox
         command: ['sh']
-        # 同樣透過 nslookup 檢查 vprocache01 服務是否已在網路中就緒
+        # 循環檢查 vprocache01 Service 是否已在內部網路生效
         args: ['-c', 'until nslookup vprocache01.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for memcache; sleep 2; done;']
