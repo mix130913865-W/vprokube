@@ -1,43 +1,50 @@
+# 指定 API Version 與 Resource Type
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: vprodb
+  name: vprodb          # Deployment 的 Name
   labels:
-    app: vprodb
+    app: vprodb         # 用於識別此 Deployment 的 Label
 spec:
   selector:
     matchLabels:
-      app: vprodb
-  replicas: 1
+      app: vprodb       # 確保 Deployment 管理帶有此 Label 的 Pod
+  replicas: 1           # 指定 Pod 的 Replica 數量為 1
   template:
     metadata:
       labels:
-        app: vprodb
+        app: vprodb     # 設定 Pod 的 Label，須與 Selector 匹配
     spec:
       containers:
       - name: vprodb
-        image: vprocontainers/vprofiledb
+        image: vprocontainers/vprofiledb # 資料庫的 Container Image
         volumeMounts:
-        - mountPath: /var/lib/mysql
-          name: vpro-db-data
+        - mountPath: /var/lib/mysql      # Container 內部的掛載路徑
+          name: vpro-db-data             # 對應下方定義的 Volume Name
         ports:
         - name: vprodb-port
-          containerPort: 3306
+          containerPort: 3306            # MySQL 預設監聽的 Port
         env:
-         - name: MYSQL_ROOT_PASSWORD
-           valueFrom:
-             secretKeyRef:
-               name: app-secret
-               key: db-pass
-      volumes:
-        - name: vpro-db-data
-          persistentVolumeClaim:
-            claimName: db-pv-claim 
+        - name: MYSQL_ROOT_PASSWORD      # 設定資料庫 Root 密碼
+          valueFrom:
+            secretKeyRef:                # 從 Secret 物件安全取得資訊
+              name: app-secret           # 參照的 Secret Name
+              key: db-pass               # 參照的 Key
 
+      # 定義使用的 Storage 資源
+      volumes:
+      - name: vpro-db-data
+        persistentVolumeClaim:           # 使用 PVC 實作 Data Persistence
+          claimName: db-pv-claim 
+
+      # Init Container：在主容器啟動前執行
       initContainers:
-        - name: busybox
-          image: busybox:latest
-          command: ["sh", "-c", "rm -rf /var/lib/mysql/lost+found"]
-          volumeMounts:
-            - name: vpro-db-data
-              mountPath: /var/lib/mysql
+      - name: busybox
+        image: busybox:latest
+        # 指令：刪除 /var/lib/mysql/lost+found 資料夾
+        # 理由：在某些 StorageClass (如 AWS EBS) 掛載時會自動產生此資料夾，
+        # 可能導致 MySQL 初始化失敗
+        command: ["sh", "-c", "rm -rf /var/lib/mysql/lost+found"]
+        volumeMounts:
+        - name: vpro-db-data
+          mountPath: /var/lib/mysql
