@@ -1,12 +1,18 @@
+# 指定 API Version 與 Resource Type
 apiVersion: v1
 kind: Service
 metadata:
-  name: vproapp-service
+  name: vproapp-service    # Service 的 Name，供 Cluster 內部 DNS 解析使用
 spec:
+  # 網路 Port Mapping 配置
   ports:
-  - port: 8080
-    protocol: TCP
-    targetPort: 8080
+  - port: 8080             # Service 暴露在 Cluster 內部的 Virtual Port
+    protocol: TCP          # Transport Layer Protocol
+    targetPort: 8080       # 流量導向後端 Pod 容器實際監聽的 Port
+
+  # Label Selector
   selector:
-    app: vproapp
-  type: ClusterIP
+    app: vproapp           # 定義此 Service 轉發流量的目標 Pod Label
+
+  # Service Type
+  type: ClusterIP          # 預設類型，僅供 Cluster 內部通訊，不會分配 External IP
