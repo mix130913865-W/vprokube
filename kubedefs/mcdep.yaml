@@ -1,22 +1,24 @@
+# API Version 與資源類型
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: vpromc
+  name: vpromc             # Deployment 名稱
   labels:
-    app: vpromc
+    app: vpromc            # 資源識別 Label
 spec:
+  # Label Selector (標籤選擇器)
   selector:
     matchLabels:
-      app: vpromc
-  replicas: 1
+      app: vpromc          # 確保 Deployment 管理帶有此標籤的 Pod
+  replicas: 1              # 定義運行的 Pod 副本數量
   template:
     metadata:
       labels:
-        app: vpromc
+        app: vpromc        # 設定 Pod 的 Label，須與 Selector 匹配
     spec:
       containers:
       - name: vpromc
-        image: memcached
+        image: memcached   # 使用官方 Memcached 鏡像 (Image)
         ports:
         - name: vpromc-port
-          containerPort: 11211
+          containerPort: 11211 # Memcached 預設監聽的 Port
