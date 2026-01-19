@@ -1,12 +1,18 @@
+# API Version 與 Resource Type
 apiVersion: v1
 kind: Service
 metadata:
-  name: vpromq01
+  name: vpromq01           # Service 名稱，供應用程式透過 DNS 直接連線
 spec:
+  # 網路 Port 配置
   ports:
-  - port: 5672
-    targetPort: vpromq01-port
-    protocol: TCP
+  - port: 5672             # Service 在 Cluster 內部開放的 Port
+    targetPort: vpromq01-port # 流量導向 Pod 中定義的具體 Port 名稱 (5672)
+    protocol: TCP          # 傳輸層協定使用 TCP
+    
+  # Label Selector
   selector:
-    app: vpromq01
-  type: ClusterIP
+    app: vpromq01          # 根據 Label 自動對接帶有此標籤的 RabbitMQ Pod
+    
+  # Service Type
+  type: ClusterIP          # 僅供 Cluster 內部通訊，確保 Message Broker 不對外暴露
