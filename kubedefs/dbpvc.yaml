@@ -1,13 +1,19 @@
+# API Version 與資源類型
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: db-pv-claim
+  name: db-pv-claim        # PVC 名稱，供 Deployment 引用
   labels:
-    app: vprodb
+    app: vprodb            # 資源識別 Label
 spec:
+  # 儲存類別，使用 default 觸發 Dynamic Provisioning (動態建立實體硬碟)
   storageClassName: default
+  
+  # Access Modes (存取模式)
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteOnce        # RWO：僅限單一 Node 掛載讀寫，確保 Data Integrity
+    
+  # 資源請求
   resources:
     requests:
-      storage: 3Gi
+      storage: 3Gi         # 申請 3GB 的 Storage 容量
