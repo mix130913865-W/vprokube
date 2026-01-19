@@ -1,31 +1,32 @@
+# API Version 與 Resource Type
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: vpromq01
+  name: vpromq01           # Deployment 名稱
   labels:
-    app: vpromq01
+    app: vpromq01          # 資源識別 Label
 spec:
+  # Label Selector
   selector:
     matchLabels:
-      app: vpromq01
-  replicas: 1
+      app: vpromq01        # 確保 Deployment 管理帶有此標籤的 Pod
+  replicas: 1              # 定義運行的 Pod 副本數量
   template:
     metadata:
       labels:
-        app: vpromq01
+        app: vpromq01      # 設定 Pod 的 Label，須與 Selector 匹配
     spec:
       containers:
       - name: vpromq01
-        image: rabbitmq
+        image: rabbitmq    # 使用官方 RabbitMQ Image
         ports:
         - name: vpromq01-port
-          containerPort: 5672
+          containerPort: 5672 # RabbitMQ 標準通訊協定 (AMQP) Port
         env: 
          - name: RABBITMQ_DEFAULT_PASS
            valueFrom:
-             secretKeyRef:
+             secretKeyRef: # 從 Secret 安全地注入密碼
                name: app-secret
                key: rmq-pass
          - name: RABBITMQ_DEFAULT_USER
-           value: "guest"
-
+           value: "guest"  # 設定預設使用者名稱
