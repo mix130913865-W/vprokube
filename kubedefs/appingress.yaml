@@ -1,19 +1,25 @@
+# 指定 API 版本與資源類型
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: vpro-ingress
+  name: vpro-ingress           # Ingress 資源的名稱
   annotations:
+    # 註解 (Annotations)：給 Ingress Controller (如 Nginx) 的額外指令
+    # 這裡啟用了 Regex (正規表示式) 支援，允許在 path 中使用特殊比對規則
     nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
+  # 指定使用的 Ingress 控制器類別，這裡指定為 nginx
   ingressClassName: nginx
   rules:
-  - host: vprofile.lifecoachvida.com
+  - host: vprofile.lifecoachvida.com  # 規則 1：比對請求的 Domain Name (網域名稱)
     http:
       paths:
-      - path: /
+      - path: /                # 定義 URL 路徑
+        # PathType (路徑比對類型)：
+        # Prefix 代表「前綴比對」，即只要開頭符合 "/" 的請求都會被轉發
         pathType: Prefix
-        backend:
+        backend:               # 定義流量轉發的後端目標
           service:
-            name: vproapp-service
+            name: vproapp-service # 轉發到名為 vproapp-service 的 Service
             port:
-              number: 8080
+              number: 8080        # 指向該 Service 暴露的 8080 Port
