@@ -1,22 +1,25 @@
-version: '3.8'
+version: '3.8' # Docker Compose 檔案格式版本
 services:
+  # 資料庫服務 (MySQL)
   vprodb:
     build: 
-      context: ./Docker-files/db
+      context: ./Docker-files/db # 指定 Dockerfile 所在路徑進行編譯
     image: vprocontainers/vprofiledb
     container_name: vprodb
     ports:
-      - "3306:3306"
+      - "3306:3306" # 主機 Port 映射至 Container Port
     volumes:
-      - vprodbdata:/var/lib/mysql
+      - vprodbdata:/var/lib/mysql # Data Persistence (資料持久化)
     environment:
-      - MYSQL_ROOT_PASSWORD=vprodbpass
+      - MYSQL_ROOT_PASSWORD=vprodbpass # 設定環境變數 (Environment Variables)
 
+  # 快取服務 (Memcached)
   vprocache01:
     image: memcached
     ports:
       - "11211:11211"
 
+  # 訊息佇列服務 (RabbitMQ)
   vpromq01:
     image: rabbitmq
     ports:
@@ -25,6 +28,7 @@ services:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
 
+  # 核心應用程式 (Java/Tomcat)
   vproapp:
     build: 
       context: ./Docker-files/app
@@ -33,17 +37,18 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - vproappdata:/usr/local/tomcat/webapps
-    
+      - vproappdata:/usr/local/tomcat/webapps # 掛載程式碼路徑
+
+  # 網頁伺服器入口 (Nginx)
   vproweb:
     build: 
       context: ./Docker-files/web
     image: vprocontainers/vprofileweb
     container_name: vproweb
     ports:
-      - "80:80"
+      - "80:80" # 對外開放的 HTTP 入口
 
+# 定義具名的 Volumes，供上方服務使用以儲存持久化資料
 volumes:
    vprodbdata: {}
    vproappdata: {}
-  
