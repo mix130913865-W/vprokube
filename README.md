@@ -56,9 +56,9 @@
 │   └── secret.yaml.example         # Secret 範本（不直接 commit）
 │
 └── docker-compose.yml              # Local 開發 / 測試用途
-
+```
 ## 3. 系統整體架構圖（Architecture Diagram）
-## 3.1 對外存取流程（Ingress Flow）
+### 3.1 對外存取流程（Ingress Flow）
 ```
         Client / Browser
                |
@@ -72,7 +72,7 @@
                |
           vproapp Pod
 ```
-## 3.2 內部服務關聯架構
+### 3.2 內部服務關聯架構
 ```
                      +-------------------+
                      |   vproapp Pod     |
