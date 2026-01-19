@@ -53,7 +53,7 @@
 │   ├── rmqdeploy.yaml              # RabbitMQ Deployment
 │   ├── rmqservice.yaml             # RabbitMQ Service
 │   │
-│   └── secret.yaml.example         # Secret 範本（不直接 commit）
+│   └── secret.yaml.example         # Secret 範本（正式不直接 commit）
 │
 └── docker-compose.yml              # Local 開發 / 測試用途
 ```
@@ -81,9 +81,9 @@
                                |
         ------------------------------------------------
         |                     |                        |
-  vprodb Service       vprocache Service        rmq Service
+  vprodb Service       vprocache Service         rmq Service
         |                     |                        |
-  MySQL Pod           Memcached Pod           RabbitMQ Pod
+    MySQL Pod           Memcached Pod            RabbitMQ Pod
         |
-   PersistentVolume
+ PersistentVolume
 ```
